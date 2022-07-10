@@ -1,0 +1,35 @@
+---
+- name: Ansible Playbook
+  hosts: webserver
+  remote_user: ubuntu
+
+  tasks:
+     - name: Finding remote server Metadata using curl command
+       ansible.builtin.shell: curl http://169.254.169.254/latest/meta-data/
+       become: true
+       register: command_output
+
+     - name: Displaying output of curl command
+       debug:
+         msg: "output is {{command_output}}"
+
+     - name: Viewing the Information of the AWS EC2 instance
+       amazon.aws.ec2_instance_info:
+         region: "us-east-1"
+         filters:
+            "tag:Name": "t2.micro"
+            instance-state-name: [ "running"]
+       register: ec2_information
+
+     - name: Displaying output of EC2 information
+       debug:
+         msg: "output is {{ec2_information}}"
+
+     - name: Viewing the Metadata of the AWS EC2 instance
+       amazon.aws.ec2_metadata_facts:
+       register: ec2_metadata
+
+     - name: Displaying metadata of AWS EC2
+       debug:
+         msg: "output is {{ec2_metadata}}"
+
